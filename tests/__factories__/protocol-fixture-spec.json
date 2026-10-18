@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic",
+  "protocolVersion": 22,
+  "network": "testnet",
+  "seed": "protocol-provenance-v1",
+  "startLedger": 1000,
+  "reference": "https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md"
+}
