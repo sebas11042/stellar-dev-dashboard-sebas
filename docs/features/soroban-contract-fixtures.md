@@ -6,6 +6,14 @@ Deterministic `simulateTransaction` responses for Soroban tests. They cover a su
 - **Classifier:** `src/lib/stellar/simulationOutcome.ts`, which turns any raw simulation response into an outcome kind the UI can branch on
 - **Tests:** `tests/unit/sorobanContractFixtures.test.ts`
 
+The factory also generates the committed [protocol corpus](./protocol-fixture-provenance.md),
+which records its modeled protocol, SDK version, source hashes and payload hashes.
+After changing the factory or its recorded inputs, run
+`pnpm run fixtures:protocol:refresh` and commit the reviewed generated diff.
+`FIXTURE_PROTOCOL_VERSION` identifies the modeled protocol; it does not track the
+live network automatically. CI rejects stale provenance with
+`pnpm run fixtures:protocol:check`.
+
 ## Quick start
 
 ```ts
