@@ -1,0 +1,30 @@
+.signing-review-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 75%);
+}
+
+.signing-review {
+  width: min(100%, 52rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 1.25rem;
+  border: 2px solid var(--border, #64748b);
+  border-radius: 0.75rem;
+  color: var(--text-primary, #f8fafc);
+  background: var(--bg-base, #0f172a);
+}
+
+.signing-review-content { max-height: 55dvh; overflow: auto; }
+.signing-review dt { margin-top: 0.75rem; font-weight: 700; text-transform: capitalize; }
+.signing-review dd { margin-inline-start: 1rem; }
+.signing-review-value { white-space: pre-wrap; overflow-wrap: anywhere; font-family: monospace; }
+.signing-review-acknowledgement { display: flex; gap: 0.5rem; margin-block: 1rem; align-items: start; }
+.signing-review-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.signing-review button { min-height: 44px; padding: 0.5rem 1rem; font: inherit; cursor: pointer; }
+.signing-review button:disabled { cursor: not-allowed; opacity: 0.6; }
+.signing-review :focus-visible { outline: 3px solid var(--cyan, #22d3ee); outline-offset: 3px; }
