@@ -15,12 +15,19 @@ it('application callers use reviewed adapters instead of raw wallet transports',
       else if (/\.[jt]sx?$/.test(entry.name) && !/\.test\./.test(entry.name)) {
         const relative = path.slice(sourceRoot.length).replaceAll('\\', '/');
         if (relative.startsWith('lib/wallet/')) continue; // transport implementations and their reviewed registry
-        if (/\b(?:signTransactionWith(?:Freighter|XBull|Lobstr|Solar|Ledger)|signXdrWith(?:Ledger|WalletConnect)|signWith(?:SolarSEP7|SEP7))\b/.test(readFileSync(path, 'utf8'))) {
+        if (
+          /\b(?:signTransactionWith(?:Freighter|XBull|Lobstr|Solar|Ledger)|signXdrWith(?:Ledger|WalletConnect)|signWith(?:SolarSEP7|SEP7))\b/.test(
+            readFileSync(path, 'utf8')
+          )
+        ) {
           violations.push(relative);
         }
       }
     }
   }
   inspect(sourceRoot);
-  expect(violations, 'Route wallet signing through getWalletAdapter so every caller receives payload review.').toEqual([]);
+  expect(
+    violations,
+    'Route wallet signing through getWalletAdapter so every caller receives payload review.'
+  ).toEqual([]);
 });
