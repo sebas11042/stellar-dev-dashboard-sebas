@@ -67,7 +67,8 @@ is captured. To change the synthetic ledger baseline, edit `startLedger` in the 
 ## Automation and merge requirements
 
 The **Protocol fixture provenance** workflow runs integrity checks, lifecycle and
-CLI tests, SDK/classifier integration tests, and tooling formatting on pull requests
+CLI tests, SDK/classifier integration tests, corpus integration type checking,
+and tooling formatting on pull requests
 and default-branch pushes across Node 22, 24 and 26. Add its three integrity jobs
 to branch protection as required checks; repository settings cannot be enforced
 by a workflow file alone.

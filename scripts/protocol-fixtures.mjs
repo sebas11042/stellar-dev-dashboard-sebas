@@ -29,6 +29,18 @@ export function validateSpec(spec) {
   if (!spec || spec.schemaVersion !== 1 || spec.kind !== 'synthetic') {
     throw new Error('Expected schemaVersion 1 and synthetic fixture provenance');
   }
+  const fields = [
+    'schemaVersion',
+    'kind',
+    'protocolVersion',
+    'network',
+    'seed',
+    'startLedger',
+    'reference',
+  ];
+  if (Object.keys(spec).some((key) => !fields.includes(key))) {
+    throw new Error('Unknown provenance field; do not record credentials or captured payloads');
+  }
   if (spec.network !== 'testnet') throw new Error('Protocol corpus must use testnet');
   if (
     !Number.isInteger(spec.protocolVersion) ||

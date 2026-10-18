@@ -45,7 +45,12 @@ describe('provenance-tracked protocol corpus', () => {
 
   it('tracks the shared factory and the modeled protocol', () => {
     expect(corpus.provenance.protocolVersion).toBe(FIXTURE_PROTOCOL_VERSION);
-    const factory = createSorobanFixtureFactory(corpus.provenance);
+    const factory = createSorobanFixtureFactory({
+      seed: corpus.provenance.seed,
+      network: 'testnet',
+      startLedger: corpus.provenance.startLedger,
+    });
+    expect(corpus.provenance.network).toBe(factory.network);
     expect(corpus.cases.find((entry) => entry.name === 'success')!.response).toEqual(
       factory.simulationSuccess()
     );

@@ -39,6 +39,12 @@ jobs:
       - run: pnpm run fixtures:protocol:check
       - run: pnpm run test:protocol-fixtures
       - run: pnpm exec vitest run tests/unit/protocolFixtureCorpus.test.ts tests/unit/sorobanContractFixtures.test.ts
+      - name: Type check corpus integration
+        run: >-
+          pnpm exec tsc --noEmit --skipLibCheck --target ES2022 --module ESNext
+          --moduleResolution bundler --resolveJsonModule --esModuleInterop
+          --types node --typeRoots packages/core/node_modules/@types
+          tests/unit/protocolFixtureCorpus.test.ts
       - name: Verify fixture tooling formatting
         run: pnpm exec prettier --check scripts/protocol-fixtures.mjs scripts/refresh-protocol-fixtures.mjs tests/ci/protocol-fixture-*.test.mjs tests/unit/protocolFixtureCorpus.test.ts tests/__factories__/protocol-fixture-spec.json .github/workflows/protocol-fixtures.yml
 

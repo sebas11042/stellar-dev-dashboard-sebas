@@ -27,7 +27,7 @@
       },
       {
         "path": "scripts/protocol-fixtures.mjs",
-        "sha256": "35f69f27ea723190d1c2c922c1cd5ab2cb9592139bac57ab60724ed6576fd7bd"
+        "sha256": "6ff59777852cad83d424f109e9808fb42c16856498d31de4f889a6d153112143"
       },
       {
         "path": "scripts/refresh-protocol-fixtures.mjs",

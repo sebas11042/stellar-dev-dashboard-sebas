@@ -35,5 +35,6 @@ test('rejects invalid provenance and dangerous network substitutions', () => {
     invalid.push({ ...spec, startLedger });
   for (const seed of ['', '   ', null, 42]) invalid.push({ ...spec, seed });
   invalid.push({ ...spec, reference: 'https://localhost/secrets' });
+  invalid.push({ ...spec, authorization: 'must never enter provenance' });
   for (const value of invalid) assert.throws(() => validateSpec(value));
 });
