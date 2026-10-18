@@ -140,4 +140,16 @@ describe('mandatory adapter signing review', () => {
     ).rejects.toThrow('changed');
     expect(provider.signTransaction).not.toHaveBeenCalled();
   });
+
+  it('refuses an unknown signer and recovers after reconnecting', async () => {
+    provider.getAddress.mockResolvedValueOnce({ address: null });
+    await expect(
+      getWalletAdapter('freighter').signTransaction(signingRequest().payload, 'testnet')
+    ).rejects.toThrow('Reconnect');
+    expect(mocks.present).not.toHaveBeenCalled();
+    expect(provider.signTransaction).not.toHaveBeenCalled();
+    await expect(
+      getWalletAdapter('freighter').signTransaction(signingRequest().payload, 'testnet')
+    ).resolves.toBe('signed transaction');
+  });
 });

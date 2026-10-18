@@ -14,9 +14,11 @@ export function summarizeSigningPayload(request: SigningRequest): SigningSummary
   }
   if (!StrKey.isValidEd25519PublicKey(request.signer))
     throw new Error('A valid signer account is required.');
-  const bytes = new TextEncoder().encode(request.payload);
   const limit =
     request.kind === 'message' ? SIGNING_LIMITS.messageBytes : SIGNING_LIMITS.payloadBytes;
+  if (request.payload.length > limit)
+    throw new Error('Signing payload exceeds the safe review limit.');
+  const bytes = new TextEncoder().encode(request.payload);
   if (bytes.length > limit) throw new Error('Signing payload exceeds the safe review limit.');
   if (new TextDecoder('utf-8', { ignoreBOM: true }).decode(bytes) !== request.payload)
     throw new Error('Signing payload contains invalid Unicode.');

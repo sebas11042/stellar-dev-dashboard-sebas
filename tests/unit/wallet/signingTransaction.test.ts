@@ -2,6 +2,7 @@
 import { describe, expect, it, vi } from 'vitest';
 vi.unmock('@stellar/stellar-sdk');
 import { summarizeSigningPayload } from '../../../src/lib/wallet/signingPayload';
+import { SIGNING_LIMITS, type SigningRequest } from '../../../src/lib/wallet/signingPayloadTypes';
 import { signingRequest, signingRecipient } from '../../__factories__/signingPayloads';
 
 describe('readable transaction signing', () => {
@@ -28,5 +29,17 @@ describe('readable transaction signing', () => {
     expect(() => summarizeSigningPayload(signingRequest(`${signingRequest().payload}\n`))).toThrow(
       'canonical'
     );
+  });
+
+  it('rejects oversized XDR before attempting to decode it', () => {
+    expect(() =>
+      summarizeSigningPayload(signingRequest('A'.repeat(SIGNING_LIMITS.payloadBytes + 1)))
+    ).toThrow('limit');
+  });
+
+  it('refuses future payload kinds until their decoder and review are implemented', () => {
+    expect(() =>
+      summarizeSigningPayload({ ...signingRequest(), kind: 'unknown' } as unknown as SigningRequest)
+    ).toThrow('Unsupported');
   });
 });
