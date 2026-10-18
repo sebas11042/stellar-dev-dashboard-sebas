@@ -25,7 +25,8 @@ describe('SigningPayloadReview', () => {
     expect(screen.getByRole('button', { name: 'Cancel signing' })).toHaveFocus();
     await user.click(screen.getByRole('checkbox'));
     await user.dblClick(approve);
-    expect(decide).toHaveBeenCalledExactlyOnceWith(true);
+    expect(decide).toHaveBeenCalledTimes(1);
+    expect(decide).toHaveBeenCalledWith(true);
   });
 
   it('supports Escape and traps keyboard focus within the dialog', async () => {

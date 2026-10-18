@@ -19,6 +19,8 @@ import {
 } from './walletconnect'
 import { connectHardwareWallet } from './devices'
 import { disconnectLedger, signXdrWithLedger } from './ledger'
+import { executeSigningReview } from './signingReviewGate'
+import type { SigningPayloadKind } from './signingPayloadTypes'
 
 export type WalletId = 'freighter' | 'xbull' | 'albedo' | 'lobstr' | 'hana' | 'ledger' | 'walletconnect' | 'solar'
 
@@ -126,6 +128,25 @@ function createAdapter(
     disconnect?: WalletAdapter['disconnect']
   }
 ): WalletAdapter {
+  async function reviewedSigning(kind: SigningPayloadKind, payload: string, network: NetworkName,
+    sign: (_payload: string) => Promise<string>) {
+    const signer = await options.getAddress()
+    if (!signer) throw new Error('Cannot verify the signer account. Reconnect the wallet and try again.')
+    const passphrase = NETWORKS[network]?.passphrase
+    const { useStore } = await import('../store')
+    const context = () => {
+      const state = useStore.getState()
+      return JSON.stringify([state.walletConnected, state.walletType, state.walletPublicKey, state.network, NETWORKS[network]?.passphrase])
+    }
+    const dashboardContext = context()
+    return executeSigningReview({ kind, payload, signer, networkPassphrase: passphrase }, async (summary) => {
+      const { presentSigningReview } = await import('../../components/security/presentSigningReview')
+      return presentSigningReview(summary)
+    }, async () => context() === dashboardContext
+      && await options.getAddress() === signer
+      && (capabilities.networkIndependent || await options.getNetwork() === network),
+    (request) => sign(request.payload))
+  }
   return {
     id,
     capabilities,
@@ -137,14 +158,15 @@ function createAdapter(
       if (!capabilities.transactionSigning) throw new Error(`${id} does not support transaction signing.`)
       validateTransactionNetwork(xdr, network)
       requireSigningNetwork(this, await options.getNetwork(), network)
-      return options.signTransaction(xdr, network)
+      return reviewedSigning('transaction', xdr, network, (payload) => options.signTransaction(payload, network))
     },
     async signAuthEntry(xdr, network) {
       if (!capabilities.authEntrySigning || !options.signAuthEntry) {
         throw new Error(`${id} does not support authorization-entry signing.`)
       }
       requireSigningNetwork(this, await options.getNetwork(), network)
-      return options.signAuthEntry(xdr, network)
+      const sign = options.signAuthEntry
+      return reviewedSigning('authorization', xdr, network, (payload) => sign(payload, network))
     },
     async disconnect() {
       await options.disconnect?.()

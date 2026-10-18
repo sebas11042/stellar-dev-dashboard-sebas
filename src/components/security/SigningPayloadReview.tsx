@@ -38,7 +38,8 @@ export default function SigningPayloadReview({ summary, onDecision }: {
       ref={container} tabIndex={-1} onKeyDown={(event) => {
         if (event.key === 'Escape') { event.preventDefault(); decide(false); }
         if (event.key !== 'Tab') return;
-        const controls = container.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input, summary, [tabindex="0"]');
+        const controls = Array.from(container.current?.querySelectorAll<HTMLElement>('button, input, summary, [tabindex="0"]') ?? [])
+          .filter((element) => !element.hasAttribute('disabled'));
         if (!controls?.length) return;
         const first = controls[0]; const last = controls[controls.length - 1];
         if (event.shiftKey && (document.activeElement === first || document.activeElement === container.current)) {
