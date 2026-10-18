@@ -4,6 +4,7 @@
  */
 
 import { Keypair } from '@stellar/stellar-sdk'
+import { executeSigningReview } from './wallet/signingReviewGate'
 import {
   generateDID,
   generateChallenge,
@@ -327,7 +328,18 @@ export async function authenticateWithFreighter(): Promise<DIDAuthResult> {
 
     // Sign the challenge with Freighter
     const message = JSON.stringify(session.challenge)
-    const signature = await window.freighterApi.signMessage(message)
+    const provider = window.freighterApi
+    const origin = window.location.origin
+    const signature = await executeSigningReview({ kind: 'message', payload: message, signer: publicKey, origin },
+      async (summary) => {
+        const { presentSigningReview } = await import('../components/security/presentSigningReview')
+        return presentSigningReview(summary)
+      }, async () => {
+        const current = getAuthSession()
+        return window.freighterApi === provider && await provider.getPublicKey() === publicKey
+          && window.location.origin === origin && current?.sessionId === session.sessionId
+          && current.expiresAt > Date.now() && JSON.stringify(current.challenge) === message
+      }, (request) => provider.signMessage(request.payload))
 
     if (!signature) {
       return { success: false, did: null, error: 'Failed to sign message with Freighter' }
