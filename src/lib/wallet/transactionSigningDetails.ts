@@ -10,7 +10,7 @@ function innerDetails(transaction: Transaction): { [key: string]: ReadableValue 
     memo: readableValue(transaction.memo),
     operations: transaction.operations.map((operation, index) => ({
       number: String(index + 1),
-      ...readableValue(operation) as { [key: string]: ReadableValue },
+      ...(readableValue(operation) as { [key: string]: ReadableValue }),
     })),
     // Include every envelope field, not only a selected payment preview. This
     // also preserves preconditions, Soroban resources, auth and extension data.

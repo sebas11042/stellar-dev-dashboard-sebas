@@ -1,15 +1,25 @@
 import { Address, Asset, scValToNative, xdr } from '@stellar/stellar-sdk';
-import { Buffer } from 'buffer';
 import { SIGNING_LIMITS, type ReadableValue } from './signingPayloadTypes';
+
+export function signingBytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
 
 /** Expose controls and bidi overrides instead of letting them disguise text. */
 export function visibleText(text: string): string {
-  return text.replace(/[\u0000-\u001f\u007f-\u009f\u061c\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/g,
-    (character) => `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`);
+  return text.replace(
+    /[\p{Cc}\u061c\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/gu,
+    (character) => `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`
+  );
 }
 
 export function readableLabel(name: string): string {
-  return visibleText(name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').trim());
+  return visibleText(
+    name
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replace(/_/g, ' ')
+      .trim()
+  );
 }
 
 /** Keep amounts/integers exact. Never silently truncate an unsupported value. */
@@ -33,14 +43,19 @@ export function readableValue(input: unknown): ReadableValue {
     ancestors.add(value);
     try {
       if (value instanceof Asset) {
-        return value.isNative() ? { asset: 'XLM' } : { asset: value.getCode(), issuer: value.getIssuer() };
+        return value.isNative()
+          ? { asset: 'XLM' }
+          : { asset: value.getCode(), issuer: value.getIssuer() };
       }
-      if (value instanceof Uint8Array || Buffer.isBuffer(value)) {
-        return { encoding: 'hex', bytes: Buffer.from(value).toString('hex') };
+      if (value instanceof Uint8Array) {
+        return { encoding: 'hex', bytes: signingBytesToHex(value) };
       }
       if (Array.isArray(value)) return value.map((item) => visit(item, depth + 1));
       if (value instanceof Map) {
-        return [...value].map(([key, entry]) => ({ key: visit(key, depth + 1), value: visit(entry, depth + 1) }));
+        return [...value].map(([key, entry]) => ({
+          key: visit(key, depth + 1),
+          value: visit(entry, depth + 1),
+        }));
       }
       if (value instanceof Date) return value.toISOString();
       const record = value as Record<string, unknown>;
@@ -49,7 +64,10 @@ export function readableValue(input: unknown): ReadableValue {
       if (typeof record.type === 'string' && record.type.startsWith('scAddressType')) {
         return Address.fromScAddress(value as xdr.ScAddress).toString();
       }
-      if (typeof record.type === 'string' && /^scv(?:[UI](?:32|64|128|256)|Timepoint|Duration)$/.test(record.type)) {
+      if (
+        typeof record.type === 'string' &&
+        /^scv(?:[UI](?:32|64|128|256)|Timepoint|Duration)$/.test(record.type)
+      ) {
         return { type: record.type, value: visit(scValToNative(value as xdr.ScVal), depth + 1) };
       }
       if (value.constructor.name === 'XdrString' && record.bytes instanceof Uint8Array) {

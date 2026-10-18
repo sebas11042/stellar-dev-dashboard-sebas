@@ -18,11 +18,15 @@ describe('readable transaction signing', () => {
   });
 
   it('rejects missing network context rather than falling back to testnet', () => {
-    expect(() => summarizeSigningPayload({ ...signingRequest(), networkPassphrase: '' })).toThrow('passphrase');
+    expect(() => summarizeSigningPayload({ ...signingRequest(), networkPassphrase: '' })).toThrow(
+      'passphrase'
+    );
   });
 
   it('rejects invalid and noncanonical XDR', () => {
     expect(() => summarizeSigningPayload(signingRequest('invalid'))).toThrow();
-    expect(() => summarizeSigningPayload(signingRequest(`${signingRequest().payload}\n`))).toThrow('canonical');
+    expect(() => summarizeSigningPayload(signingRequest(`${signingRequest().payload}\n`))).toThrow(
+      'canonical'
+    );
   });
 });

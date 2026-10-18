@@ -11,9 +11,14 @@ export interface SigningRequest {
   origin?: string;
 }
 
-export type ReadableValue = string | boolean | null | ReadableValue[] | {
-  [key: string]: ReadableValue;
-};
+export type ReadableValue =
+  | string
+  | boolean
+  | null
+  | ReadableValue[]
+  | {
+      [key: string]: ReadableValue;
+    };
 
 export interface SigningSummary {
   title: string;

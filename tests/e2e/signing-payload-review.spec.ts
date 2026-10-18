@@ -3,8 +3,12 @@ import AxeBuilder from '@axe-core/playwright';
 
 test.beforeEach(async ({ page }) => {
   // No Horizon/RPC/provider calls are permitted by this synthetic fixture.
-  await page.route('**/*', (route) => new URL(route.request().url()).hostname === 'localhost'
-    || new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
+  await page.route('**/*', (route) =>
+    new URL(route.request().url()).hostname === 'localhost' ||
+    new URL(route.request().url()).hostname === '127.0.0.1'
+      ? route.continue()
+      : route.abort()
+  );
   await page.goto('/tests/e2e/fixtures/signing-payload-review.html');
 });
 
@@ -16,7 +20,14 @@ for (const kind of ['transaction', 'fee-bump', 'authorization', 'message']) {
     await expect(page.getByTestId('signature-count')).toHaveText('0');
     const approve = dialog.getByRole('button', { name: 'Approve and open wallet' });
     await expect(approve).toBeDisabled();
-    expect((await new AxeBuilder({ page }).include('[role="dialog"]').withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([]);
+    expect(
+      (
+        await new AxeBuilder({ page })
+          .include('[role="dialog"]')
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+          .analyze()
+      ).violations
+    ).toEqual([]);
     await dialog.getByRole('checkbox').check();
     await approve.click();
     await expect(dialog).toHaveCount(0);
@@ -27,7 +38,8 @@ for (const kind of ['transaction', 'fee-bump', 'authorization', 'message']) {
 
 test('Escape cancels, restores focus and permits retry', async ({ page }) => {
   const trigger = page.getByRole('button', { name: 'Review transaction', exact: true });
-  await trigger.click();
+  await trigger.focus();
+  await trigger.press('Enter');
   await expect(page.getByRole('button', { name: 'Cancel signing' })).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -40,7 +52,7 @@ test('Escape cancels, restores focus and permits retry', async ({ page }) => {
 
 test('changed context blocks an approved request', async ({ page }) => {
   await page.getByRole('button', { name: 'Review authorization', exact: true }).click();
-  await page.evaluate(() => window.invalidateSigningFixture());
+  await page.evaluate(() => window.dispatchEvent(new Event('invalidate-signing-fixture')));
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Approve and open wallet' }).click();
   await expect(page.getByRole('status')).toContainText('changed');
@@ -61,6 +73,8 @@ test('review fits a narrow screen and keeps keyboard focus inside', async ({ pag
   await page.getByRole('button', { name: 'Approve and open wallet' }).focus();
   await page.keyboard.press('Tab');
   await expect(page.getByLabel('Signing payload details')).toBeFocused();
-  expect(await page.getByRole('dialog').evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+  expect(
+    await page.getByRole('dialog').evaluate((node) => node.scrollWidth <= node.clientWidth)
+  ).toBe(true);
   await page.keyboard.press('Escape');
 });

@@ -1,9 +1,19 @@
+// @vitest-environment node
 import * as StellarSdk from '@stellar/stellar-sdk'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+vi.unmock('@stellar/stellar-sdk')
+vi.mock('../../../components/security/presentSigningReview', () => ({ presentSigningReview: vi.fn(async () => true) }))
+vi.mock('../../store', () => ({ useStore: { getState: () => ({ network: 'testnet' }) } }))
+vi.mock('../../stellar', async () => {
+  const { Networks } = await import('@stellar/stellar-sdk')
+  return { NETWORKS: { testnet: { passphrase: Networks.TESTNET }, mainnet: { passphrase: Networks.PUBLIC } } }
+})
 import { getWalletAdapter } from '../adapters'
 import { __resetFreighterApiCacheForTests } from '../freighter'
 
 const TESTNET_PASSPHRASE = StellarSdk.Networks.TESTNET
+const TEST_SIGNER = StellarSdk.Keypair.fromRawEd25519Seed(new Uint8Array(32).fill(11)).publicKey()
+beforeEach(() => vi.stubGlobal('window', {}))
 
 function makeUnsignedXdr() {
   const source = StellarSdk.Keypair.random()
@@ -25,8 +35,8 @@ describe('wallet adapters', () => {
   const signTransaction = vi.fn(async (xdr: string) => ({ signedTxXdr: `${xdr}-signed` }))
   const freighterApi = {
     isConnected: vi.fn(async () => ({ isConnected: true })),
-    requestAccess: vi.fn(async () => ({ address: 'GTESTADDRESS' })),
-    getAddress: vi.fn(async () => ({ address: 'GTESTADDRESS' })),
+    requestAccess: vi.fn(async () => ({ address: TEST_SIGNER })),
+    getAddress: vi.fn(async () => ({ address: TEST_SIGNER })),
     getNetwork: vi.fn(async () => ({ network: 'TESTNET' })),
     signTransaction,
   }
@@ -36,6 +46,7 @@ describe('wallet adapters', () => {
     freighterApi.getNetwork.mockResolvedValue({ network: 'TESTNET' })
     vi.clearAllMocks()
     __resetFreighterApiCacheForTests()
+    vi.unstubAllGlobals()
   })
 
   it('connects and signs through the common adapter interface', async () => {
@@ -45,7 +56,7 @@ describe('wallet adapters', () => {
     const xdr = makeUnsignedXdr()
     const signed = await adapter.signTransaction(xdr, 'testnet')
 
-    expect(connection).toMatchObject({ publicKey: 'GTESTADDRESS', network: 'testnet' })
+    expect(connection).toMatchObject({ publicKey: TEST_SIGNER, network: 'testnet' })
     expect(signed).toBe(`${xdr}-signed`)
     expect(signTransaction).toHaveBeenCalledOnce()
   })

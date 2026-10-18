@@ -132,19 +132,19 @@ function createAdapter(
     sign: (_payload: string) => Promise<string>) {
     const signer = await options.getAddress()
     if (!signer) throw new Error('Cannot verify the signer account. Reconnect the wallet and try again.')
-    const passphrase = NETWORKS[network]?.passphrase
     const { useStore } = await import('../store')
+    const passphrase = NETWORKS[network]?.passphrase
     const context = () => {
       const state = useStore.getState()
-      return JSON.stringify([state.walletConnected, state.walletType, state.walletPublicKey, state.network, NETWORKS[network]?.passphrase])
+      return JSON.stringify([state.walletConnected, state.walletType, state.walletPublicKey, state.connectedAddress, state.network, NETWORKS[network]?.passphrase])
     }
     const dashboardContext = context()
     return executeSigningReview({ kind, payload, signer, networkPassphrase: passphrase }, async (summary) => {
       const { presentSigningReview } = await import('../../components/security/presentSigningReview')
       return presentSigningReview(summary)
-    }, async () => context() === dashboardContext
-      && await options.getAddress() === signer
-      && (capabilities.networkIndependent || await options.getNetwork() === network),
+    }, async () => await options.getAddress() === signer
+      && (capabilities.networkIndependent || await options.getNetwork() === network)
+      && context() === dashboardContext,
     (request) => sign(request.payload))
   }
   return {

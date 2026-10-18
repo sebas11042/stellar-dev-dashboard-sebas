@@ -10,7 +10,8 @@ export function presentSigningReview(summary: SigningSummary): Promise<boolean> 
   }
   return new Promise((resolve, reject) => {
     const previousFocus = document.activeElement;
-    const background = [...document.body.children].filter((node): node is HTMLElement => node instanceof HTMLElement)
+    const background = [...document.body.children]
+      .filter((node): node is HTMLElement => node instanceof HTMLElement)
       .map((node) => ({ node, inert: node.inert }));
     const host = document.createElement('div');
     host.dataset.signingReview = 'true';
@@ -20,14 +21,16 @@ export function presentSigningReview(summary: SigningSummary): Promise<boolean> 
     const cleanup = () => {
       window.removeEventListener('pagehide', cancel);
       window.clearTimeout(timeout);
-      root.unmount(); host.remove();
+      root.unmount();
+      host.remove();
       for (const { node, inert } of background) node.inert = inert;
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };
     const finish = (approved: boolean) => {
       if (finished) return;
       finished = true;
-      cleanup(); resolve(approved);
+      cleanup();
+      resolve(approved);
     };
     const cancel = () => finish(false);
     const timeout = window.setTimeout(cancel, 5 * 60 * 1000);
@@ -36,7 +39,9 @@ export function presentSigningReview(summary: SigningSummary): Promise<boolean> 
       for (const { node } of background) node.inert = true;
       root.render(<SigningPayloadReview summary={summary} onDecision={finish} />);
     } catch (error) {
-      finished = true; cleanup(); reject(error);
+      finished = true;
+      cleanup();
+      reject(error);
     }
   });
 }

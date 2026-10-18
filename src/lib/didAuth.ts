@@ -335,8 +335,9 @@ export async function authenticateWithFreighter(): Promise<DIDAuthResult> {
         const { presentSigningReview } = await import('../components/security/presentSigningReview')
         return presentSigningReview(summary)
       }, async () => {
+        const address = await provider.getPublicKey()
         const current = getAuthSession()
-        return window.freighterApi === provider && await provider.getPublicKey() === publicKey
+        return window.freighterApi === provider && address === publicKey
           && window.location.origin === origin && current?.sessionId === session.sessionId
           && current.expiresAt > Date.now() && JSON.stringify(current.challenge) === message
       }, (request) => provider.signMessage(request.payload))
