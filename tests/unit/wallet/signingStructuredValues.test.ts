@@ -31,7 +31,7 @@ describe('complete structured signing details', () => {
         .addOperation(Operation.manageSellOffer({ selling: Asset.native(), buying: new Asset('USD', signingRecipient.publicKey()), amount: '1.0000001', price: { n: 1, d: 3 }, offerId: '9007199254740993' }))
         .setTimeout(0).build();
       const text = JSON.stringify(summarizeSigningPayload(signingRequest(tx.toXDR())).fields);
-      expect(text).toContain('master weight'); expect(text).toContain(signingRecipient.publicKey());
+      expect(text).toContain('master Weight'); expect(text).toContain(signingRecipient.publicKey());
       expect(text).toContain('9007199254740993'); expect(fetchSpy).not.toHaveBeenCalled();
     } finally { fetchSpy.mockRestore(); }
   });

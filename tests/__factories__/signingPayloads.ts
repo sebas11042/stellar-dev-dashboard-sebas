@@ -1,5 +1,6 @@
 import { Account, Address, Asset, Keypair, Memo, Networks, Operation, TransactionBuilder, xdr } from '@stellar/stellar-sdk';
 import type { SigningRequest } from '../../src/lib/wallet/signingPayloadTypes';
+import { Buffer } from 'buffer';
 
 // Fixed public examples; these seeds are test-only and never fund accounts.
 export const signingAccount = Keypair.fromRawEd25519Seed(Buffer.alloc(32, 11));

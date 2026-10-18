@@ -9,7 +9,7 @@ export function visibleText(text: string): string {
 }
 
 export function readableLabel(name: string): string {
-  return visibleText(name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' '));
+  return visibleText(name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').trim());
 }
 
 /** Keep amounts/integers exact. Never silently truncate an unsupported value. */
