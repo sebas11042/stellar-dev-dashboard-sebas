@@ -70,7 +70,7 @@ export function readableValue(input: unknown): ReadableValue {
       ) {
         return { type: record.type, value: visit(scValToNative(value as xdr.ScVal), depth + 1) };
       }
-      if (value.constructor.name === 'XdrString' && record.bytes instanceof Uint8Array) {
+      if (value instanceof xdr.XdrString && record.bytes instanceof Uint8Array) {
         return visibleText(new TextDecoder('utf-8', { fatal: true }).decode(record.bytes));
       }
       const entries = Object.entries(record);

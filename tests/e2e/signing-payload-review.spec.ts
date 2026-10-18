@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { signingAccount } from '../__factories__/signingPayloads';
 
 test.beforeEach(async ({ page }) => {
   // No Horizon/RPC/provider calls are permitted by this synthetic fixture.
@@ -17,6 +18,22 @@ for (const kind of ['transaction', 'fee-bump', 'authorization', 'message']) {
     await page.getByRole('button', { name: `Review ${kind}`, exact: true }).click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByText(signingAccount.publicKey(), { exact: true }).first()
+    ).toBeVisible();
+    if (kind === 'authorization') {
+      await expect(dialog.getByText('transfer', { exact: true })).toBeVisible();
+      await expect(dialog.getByText('approve', { exact: true })).toBeVisible();
+      await expect(dialog.getByText('9007199254740993', { exact: true }).first()).toBeVisible();
+    } else if (kind === 'message') {
+      await expect(
+        dialog.getByText('Log in to dashboard.example\\u000aNo funds are transferred.', {
+          exact: true,
+        })
+      ).toBeVisible();
+    } else {
+      await expect(dialog.getByText('900719925.1234567', { exact: true })).toBeVisible();
+    }
     await expect(page.getByTestId('signature-count')).toHaveText('0');
     const approve = dialog.getByRole('button', { name: 'Approve and open wallet' });
     await expect(approve).toBeDisabled();

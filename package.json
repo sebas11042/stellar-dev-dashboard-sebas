@@ -43,6 +43,7 @@
     "test:integration": "vitest run --config vitest.config.js --dir tests/integration",
     "test:wallet-signing": "vitest run tests/unit/wallet tests/unit/components/SigningPayloadReview.test.tsx src/lib/wallet/__tests__/adapters.test.ts --maxWorkers=2 --minWorkers=1",
     "test:e2e:signing": "playwright test --config tests/e2e/signing-review.config.ts",
+    "test:e2e:signing:production": "vite build --config tests/e2e/signing-review.vite.config.ts && playwright test --config tests/e2e/signing-review.production.config.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:visual": "playwright test --project=visual-mobile --project=visual-tablet --project=visual-desktop --project=visual-wide",
