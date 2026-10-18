@@ -12,6 +12,18 @@ Adapters report capabilities explicitly. Ledger supports transaction signing but
 
 Before a signature request, the adapter compares the provider's current network with the dashboard network and parses transaction XDR against that network's Stellar passphrase. A mismatch or unknown network prevents the wallet prompt. Do not weaken these checks to make a provider work; extend its `getNetwork` implementation to return a verified network identifier instead. Wallet adapters never receive secret keys.
 
+## Mandatory signing payload review
+
+Transactions (including fee-bump envelopes) and Soroban authorization entries
+require a complete readable review before the adapter invokes its transport.
+DID login messages use the same approval boundary. Optional confirmation
+preferences cannot disable it. Account, provider network and dashboard context
+are rechecked before signing; changed context requires a fresh review.
+
+Use adapters from application code; raw connector signing helpers are transport
+implementation details. See [readable signing payloads](features/readable-signing-payloads.md)
+for review fields, limits, cancellation, recovery and security considerations.
+
 ## E2E Tests
 
 Wallet e2e flows use the generic `mockWalletAdapter` fixture controls. The fixture exposes the mock through the Freighter-compatible injected API so it exercises the same adapter boundary as the browser extension. Unit tests for the registry live under `src/lib/wallet/__tests__`.

@@ -4,6 +4,8 @@ export default defineConfig({
   testDir: '.',
   testMatch: 'signing-payload-review.spec.ts',
   timeout: 30_000,
+  workers: 2,
+  forbidOnly: Boolean(process.env.CI),
   expect: { timeout: 10_000 },
   use: { baseURL: 'http://localhost:5187', trace: 'retain-on-failure' },
   projects: [
