@@ -19,7 +19,8 @@ import {
 } from 'lucide-react';
 import anchorService from '../../lib/anchors.js';
 import auditTrail from '../../lib/auditTrail.js';
-import { connectFreighter, signTransactionWithFreighter } from '../../lib/wallet/freighter.js';
+import { connectFreighter, normalizeFreighterNetwork } from '../../lib/wallet/freighter.js';
+import { getWalletAdapter } from '../../lib/wallet/adapters';
 import Sep38Quotes from './Sep38Quotes.js';
 
 const METHOD_ICONS = {
@@ -183,9 +184,11 @@ export default function AnchorIntegration() {
   }, [selectedAnchor]);
 
   const completeAnchorConnect = async (account, challengeResponse) => {
-    const signedXdr = await signTransactionWithFreighter(
+    const signingNetwork = normalizeFreighterNetwork(account.network);
+    if (!signingNetwork) throw new Error('Cannot verify the anchor signing network. Reconnect the wallet.');
+    const signedXdr = await getWalletAdapter('freighter').signTransaction(
       challengeResponse.transaction,
-      account.network
+      signingNetwork
     );
     const token = await anchorService.submitChallengeTransaction(
       selectedAnchor.id,

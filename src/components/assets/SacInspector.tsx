@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useStore } from '../../lib/store'
 import { NETWORKS, type NetworkName } from '../../lib/stellar'
 import { inspectSac, submitSacDeployment, type SacAsset, type SacInspection } from '../../lib/sac'
-import { signTransactionWithFreighter } from '../../lib/wallet/freighter'
+import { getWalletAdapter } from '../../lib/wallet/adapters'
 import { getAssetUrl, getContractUrl } from '../../lib/externalExplorers'
 
 interface SacInspectorProps { asset: SacAsset; network: NetworkName }
@@ -29,7 +29,8 @@ export default function SacInspector({ asset, network }: SacInspectorProps) {
     if (network === 'mainnet' && !window.confirm('Deploy this SAC on Stellar Mainnet? This is an irreversible network transaction.')) return
     try {
       setBusy(true)
-      const result = await submitSacDeployment(asset, connectedAddress, network, signTransactionWithFreighter)
+      const result = await submitSacDeployment(asset, connectedAddress, network,
+        (payload) => getWalletAdapter('freighter').signTransaction(payload, network))
       setMessage(`Submitted ${result.hash.slice(0, 12)}…`)
       setInspection(await inspectSac(asset, network))
     } catch (error) {
