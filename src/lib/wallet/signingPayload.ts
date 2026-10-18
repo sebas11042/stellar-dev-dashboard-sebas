@@ -52,9 +52,9 @@ export function summarizeSigningPayload(request: SigningRequest): SigningSummary
   }
   // A fingerprint binds type, raw payload, account, network and origin. It is
   // diagnostic integrity information, not a signature or a trust endorsement.
-  const fingerprint = hash(Buffer.from(JSON.stringify([
+  const fingerprint = Buffer.from(hash(Buffer.from(JSON.stringify([
     request.kind, request.payload, request.signer, request.networkPassphrase ?? null, request.origin ?? null,
-  ]))).toString('hex');
+  ])))).toString('hex');
   return {
     ...details,
     fingerprint,
