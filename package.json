@@ -9,6 +9,9 @@
   "type": "module",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "fixtures:protocol:refresh": "node scripts/refresh-protocol-fixtures.mjs",
+    "fixtures:protocol:check": "node scripts/refresh-protocol-fixtures.mjs --check",
+    "test:protocol-fixtures": "node --test tests/ci/protocol-fixture-spec.test.mjs tests/ci/protocol-fixture-refresh.test.mjs tests/ci/protocol-fixture-cli.test.mjs",
     "check:node": "node scripts/node-version-policy.mjs",
     "test:node-support": "node --test tests/node-version-policy.test.mjs",
     "test:scripts": "node --test tests/unit/scripts/type-check.test.js",
