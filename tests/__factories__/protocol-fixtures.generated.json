@@ -1,0 +1,255 @@
+{
+  "provenance": {
+    "schemaVersion": 1,
+    "kind": "synthetic",
+    "protocolVersion": 22,
+    "network": "testnet",
+    "seed": "protocol-provenance-v1",
+    "startLedger": 1000,
+    "reference": "https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md",
+    "generator": "scripts/refresh-protocol-fixtures.mjs",
+    "sdk": {
+      "name": "@stellar/stellar-sdk",
+      "version": "17.1.0"
+    },
+    "inputs": [
+      {
+        "path": "tests/__factories__/protocol-fixture-spec.json",
+        "sha256": "34c5fc39c1c93af9b851a14f73bd59d8c5044294afb7c1d5db66bcfc58dd5ed5"
+      },
+      {
+        "path": "tests/__factories__/sorobanContractFixtures.ts",
+        "sha256": "12a6232aacc3f4c2b3737be72cd54d23a00a29629bb48f9dc45bad13980a9694"
+      },
+      {
+        "path": "src/lib/stellar/simulationOutcome.ts",
+        "sha256": "797aef4760f41aa47b2188876e0d839f9e41ce05e3a3fb59abf58e59636b00cb"
+      },
+      {
+        "path": "scripts/protocol-fixtures.mjs",
+        "sha256": "35f69f27ea723190d1c2c922c1cd5ab2cb9592139bac57ab60724ed6576fd7bd"
+      },
+      {
+        "path": "scripts/refresh-protocol-fixtures.mjs",
+        "sha256": "84d44458e8cb6c456bb85aea04f29f9ddf9fe0da1060fb07f090123e588ccb43"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "sha256": "fe22ccb0049e145097736aeddcd08766479a61807a7f1ffa3bdbda4caf3f3955"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "name": "success",
+      "sha256": "dd89e84bc6beaad20700aba911b2e93657b59eb631bbfea84d5ef5b8ffcef771",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "transactionData": "AAAAAAAAAAAAAAAAABMS0AAABAAAAAIAAAAAAAAAr8g=",
+          "minResourceFee": "45000",
+          "events": [],
+          "results": [
+            {
+              "auth": [],
+              "xdr": "AAAABQAAAAAAAAAq"
+            }
+          ],
+          "cost": {
+            "cpuInsns": "1250000",
+            "memBytes": "524288"
+          },
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "cpu_limit",
+      "sha256": "f7d8d3e4900bd1c8bffca8e711f4bfb638aa28d738857edec96327df59700df3",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "transactionData": "AAAAAAAAAAAAAAAABfXhAAAABAAAAAIAAAAAAAAAr8g=",
+          "minResourceFee": "45000",
+          "events": [],
+          "results": [
+            {
+              "auth": [],
+              "xdr": "AAAABQAAAAAAAAAq"
+            }
+          ],
+          "cost": {
+            "cpuInsns": "100000000",
+            "memBytes": "524288"
+          },
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "cpu_over_limit",
+      "sha256": "ea088f555ed67668155d9ba2a4953fb3b26e233bec9d2ecba74f839053ad3801",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "transactionData": "AAAAAAAAAAAAAAAABfXhAQAABAAAAAIAAAAAAAAAr8g=",
+          "minResourceFee": "45000",
+          "events": [],
+          "results": [
+            {
+              "auth": [],
+              "xdr": "AAAABQAAAAAAAAAq"
+            }
+          ],
+          "cost": {
+            "cpuInsns": "100000001",
+            "memBytes": "524288"
+          },
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "memory_limit",
+      "sha256": "ca51b4644e6a26106583a929e25abd3a12ac5a7b58b9263a36a69990e751be83",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "transactionData": "AAAAAAAAAAAAAAAAABMS0AAABAAAAAIAAAAAAAAAr8g=",
+          "minResourceFee": "45000",
+          "events": [],
+          "results": [
+            {
+              "auth": [],
+              "xdr": "AAAABQAAAAAAAAAq"
+            }
+          ],
+          "cost": {
+            "cpuInsns": "1250000",
+            "memBytes": "41943040"
+          },
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "memory_over_limit",
+      "sha256": "476adc7a432f6f42f0c8be3869829e5d8b8ae3d25a9844174f584266aa77e1f8",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "transactionData": "AAAAAAAAAAAAAAAAABMS0AAABAAAAAIAAAAAAAAAr8g=",
+          "minResourceFee": "45000",
+          "events": [],
+          "results": [
+            {
+              "auth": [],
+              "xdr": "AAAABQAAAAAAAAAq"
+            }
+          ],
+          "cost": {
+            "cpuInsns": "1250000",
+            "memBytes": "41943041"
+          },
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "auth_failure",
+      "sha256": "b168f17a78a467c1f98dd22a00df058ebffd5a732a07c1e678fd94f36e4f65ce",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "error": "HostError: Error(Auth, InvalidAction)\n\nEvent log (newest first):\n   0: [Diagnostic Event] contract:CAHMNKD5RMONFOHMJKP7RECXOGYP47T24D5OW7YW5BTDMTCVCJOBMO3O, topics:[error, Error(Auth, InvalidAction)], data:[\"require_auth: address not authorized\", GDVMHUXRDET5L2MLRZADW2HM5DAS7CSVM4SLOPLZUPSXUI6KE7K3ZQ6R]",
+          "events": [],
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "resource_exhaustion",
+      "sha256": "15fca680cbab83da4be9fc6e904777ff91f57fd2e7daa7b90a9bec9936debaf1",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "error": "HostError: Error(Budget, ExceededLimit)\n\nEvent log (newest first):\n   0: [Diagnostic Event] contract:CAHMNKD5RMONFOHMJKP7RECXOGYP47T24D5OW7YW5BTDMTCVCJOBMO3O, topics:[error, Error(Budget, ExceededLimit)], data:\"cpu instructions limit exceeded\"",
+          "events": [],
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "restore_required",
+      "sha256": "7a7bf33fc00079c09599d46cbf31691f5356daaca27819455967a36088589c6e",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": {
+          "transactionData": "AAAAAAAAAAAAAAAAABMS0AAABAAAAAIAAAAAAAAAr8g=",
+          "minResourceFee": "45000",
+          "events": [],
+          "results": [
+            {
+              "auth": [],
+              "xdr": "AAAAAQ=="
+            }
+          ],
+          "cost": {
+            "cpuInsns": "1250000",
+            "memBytes": "524288"
+          },
+          "restorePreamble": {
+            "transactionData": "AAAAAAAAAAAAAAAAAAAAAAAACAAAAAgAAAAAAAABX5A=",
+            "minResourceFee": "90000"
+          },
+          "latestLedger": 1001
+        }
+      }
+    },
+    {
+      "name": "rpc_error",
+      "sha256": "d064db6825f10559ffc10341b7fbdd1499c8e39985d2fcdce30a37f50752a677",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "error": {
+          "code": -32602,
+          "message": "invalid parameters"
+        }
+      }
+    },
+    {
+      "name": "network",
+      "sha256": "1a20ae799a882977f5c18e7b696ca1f611a4e5ef23f33b3f12a26c226c6d870d",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "network",
+        "result": {
+          "passphrase": "Test SDF Network ; September 2015",
+          "protocolVersion": 22
+        }
+      }
+    },
+    {
+      "name": "ledger",
+      "sha256": "3b54537b90eb668d770c79ed57ab69313e6eaa99ac7fb3e6ac2c5f73412f06e2",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": "ledger",
+        "result": {
+          "id": "4dad89be92bdf8284c09bd63bb5720ff5acbdf42d003f7e8f90107a56ecbbf2b",
+          "sequence": 1000,
+          "protocolVersion": 22
+        }
+      }
+    }
+  ]
+}
