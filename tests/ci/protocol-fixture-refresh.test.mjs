@@ -3,7 +3,15 @@ import { test } from 'node:test';
 import { mkdtemp, mkdir, readFile, writeFile, copyFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { buildProtocolFixtures, refreshProtocolFixtures, serialize, digest, ROOT, INPUTS, OUTPUT } from '../../scripts/protocol-fixtures.mjs';
+import {
+  buildProtocolFixtures,
+  refreshProtocolFixtures,
+  serialize,
+  digest,
+  ROOT,
+  INPUTS,
+  OUTPUT,
+} from '../../scripts/protocol-fixtures.mjs';
 
 async function workspace(t) {
   const root = await mkdtemp(join(tmpdir(), 'protocol-fixtures-'));
@@ -33,7 +41,10 @@ test('missing check is read-only; refresh recovers and is idempotent', async (t)
   assert.equal(await refreshProtocolFixtures({ root }), false);
   assert.equal(await refreshProtocolFixtures({ root, check: true }), false);
   assert.equal(await readFile(join(root, OUTPUT), 'utf8'), before);
-  assert.equal((await readdir(dirname(join(root, OUTPUT)))).some((name) => name.endsWith('.tmp')), false);
+  assert.equal(
+    (await readdir(dirname(join(root, OUTPUT)))).some((name) => name.endsWith('.tmp')),
+    false
+  );
 });
 
 test('corrupt corpus is detected without rewriting, then repaired', async (t) => {
@@ -69,4 +80,18 @@ test('invalid inputs leave the previous corpus untouched', async (t) => {
   await writeFile(path, '{broken');
   await assert.rejects(refreshProtocolFixtures({ root }), SyntaxError);
   assert.equal(await readFile(join(root, OUTPUT), 'utf8'), before);
+});
+
+test('failed replacement preserves destination and cleans staging files', async (t) => {
+  const root = await workspace(t);
+  // A non-empty directory cannot be replaced by a file on Windows or Linux.
+  await mkdir(join(root, OUTPUT));
+  const marker = join(root, OUTPUT, 'preserved');
+  await writeFile(marker, 'existing content');
+  await assert.rejects(refreshProtocolFixtures({ root }));
+  assert.equal(await readFile(marker, 'utf8'), 'existing content');
+  assert.equal(
+    (await readdir(dirname(join(root, OUTPUT)))).some((name) => name.endsWith('.tmp')),
+    false
+  );
 });
