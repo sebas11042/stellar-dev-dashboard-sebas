@@ -49,7 +49,7 @@ export function readableValue(input: unknown): ReadableValue {
       if (typeof record.type === 'string' && record.type.startsWith('scAddressType')) {
         return Address.fromScAddress(value as xdr.ScAddress).toString();
       }
-      if (typeof record.type === 'string' && record.type.startsWith('scv')) {
+      if (typeof record.type === 'string' && /^scv(?:[UI](?:32|64|128|256)|Timepoint|Duration)$/.test(record.type)) {
         return { type: record.type, value: visit(scValToNative(value as xdr.ScVal), depth + 1) };
       }
       if (value.constructor.name === 'XdrString' && record.bytes instanceof Uint8Array) {
