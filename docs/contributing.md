@@ -115,6 +115,15 @@ response cannot overwrite state after the user switches. Use a lease from
 
 ## Testing
 
+### Protocol fixture provenance
+
+Soroban protocol samples have a deterministic, provenance-tracked corpus. After
+changing its factory, classifier, generator or dependency lockfile, run
+`pnpm run fixtures:protocol:refresh`, review the generated diff, then run
+`pnpm run fixtures:protocol:check` and `pnpm run test:protocol-fixtures`.
+See [Protocol fixture provenance](./features/protocol-fixture-provenance.md) for
+SDK integration tests, protocol migration, automated refreshes and recovery.
+
 ### Unit tests (Vitest + Testing Library)
 
 ```bash
