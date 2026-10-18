@@ -3,7 +3,12 @@ import { test } from 'node:test';
 import { readFile } from 'node:fs/promises';
 import { digest, normalizeSource, validateSpec, ROOT } from '../../scripts/protocol-fixtures.mjs';
 
-const spec = JSON.parse(await readFile(new URL('../../tests/__factories__/protocol-fixture-spec.json', import.meta.url), 'utf8'));
+const spec = JSON.parse(
+  await readFile(
+    new URL('../../tests/__factories__/protocol-fixture-spec.json', import.meta.url),
+    'utf8'
+  )
+);
 
 test('accepts the committed synthetic specification', () => {
   assert.equal(validateSpec(spec), spec);
@@ -22,9 +27,12 @@ test('accepts uint32 protocol and ledger boundaries', () => {
 
 test('rejects invalid provenance and dangerous network substitutions', () => {
   const invalid = [null, {}, { ...spec, kind: 'captured' }, { ...spec, schemaVersion: 2 }];
-  for (const network of ['mainnet', 'public', 'futurenet', 'https://localhost']) invalid.push({ ...spec, network });
-  for (const protocolVersion of [0, -1, 1.5, '22', 0x100000000]) invalid.push({ ...spec, protocolVersion });
-  for (const startLedger of [-1, 1.5, '1000', 0xffffffff, Number.MAX_SAFE_INTEGER]) invalid.push({ ...spec, startLedger });
+  for (const network of ['mainnet', 'public', 'futurenet', 'https://localhost'])
+    invalid.push({ ...spec, network });
+  for (const protocolVersion of [0, -1, 1.5, '22', 0x100000000])
+    invalid.push({ ...spec, protocolVersion });
+  for (const startLedger of [-1, 1.5, '1000', 0xffffffff, Number.MAX_SAFE_INTEGER])
+    invalid.push({ ...spec, startLedger });
   for (const seed of ['', '   ', null, 42]) invalid.push({ ...spec, seed });
   invalid.push({ ...spec, reference: 'https://localhost/secrets' });
   for (const value of invalid) assert.throws(() => validateSpec(value));

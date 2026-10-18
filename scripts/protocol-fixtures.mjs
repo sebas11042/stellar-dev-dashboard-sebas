@@ -30,14 +30,24 @@ export function validateSpec(spec) {
     throw new Error('Expected schemaVersion 1 and synthetic fixture provenance');
   }
   if (spec.network !== 'testnet') throw new Error('Protocol corpus must use testnet');
-  if (!Number.isInteger(spec.protocolVersion) || spec.protocolVersion < 1 || spec.protocolVersion > 0xffffffff) {
+  if (
+    !Number.isInteger(spec.protocolVersion) ||
+    spec.protocolVersion < 1 ||
+    spec.protocolVersion > 0xffffffff
+  ) {
     throw new Error('protocolVersion must be a positive uint32');
   }
   if (typeof spec.seed !== 'string' || !spec.seed.trim()) throw new Error('seed must be non-empty');
-  if (!Number.isInteger(spec.startLedger) || spec.startLedger < 0 || spec.startLedger > 0xffffffff - 32) {
+  if (
+    !Number.isInteger(spec.startLedger) ||
+    spec.startLedger < 0 ||
+    spec.startLedger > 0xffffffff - 32
+  ) {
     throw new Error('startLedger must leave room for the corpus within uint32');
   }
-  if (spec.reference !== 'https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md') {
+  if (
+    spec.reference !== 'https://github.com/stellar/stellar-protocol/blob/master/core/cap-0046.md'
+  ) {
     throw new Error('Unexpected protocol reference (references are never fetched)');
   }
   return spec;
@@ -64,14 +74,17 @@ async function sdkVersion() {
 }
 
 export async function buildProtocolFixtures(root = ROOT) {
-  const sources = Object.fromEntries(await Promise.all(INPUTS.map(async (path) => [
-    path, normalizeSource(await readFile(join(root, path), 'utf8')),
-  ])));
+  const sources = Object.fromEntries(
+    await Promise.all(
+      INPUTS.map(async (path) => [path, normalizeSource(await readFile(join(root, path), 'utf8'))])
+    )
+  );
   const spec = validateSpec(JSON.parse(sources[INPUTS[0]]));
   // Execute only the fixed, repository-owned factory. Transpiling in memory avoids
   // temporary executable files and works on Node 22 without experimental flags.
   const factorySource = sources[INPUTS[1]].replace(
-    "'@stellar/stellar-sdk'", JSON.stringify(import.meta.resolve('@stellar/stellar-sdk'))
+    "'@stellar/stellar-sdk'",
+    JSON.stringify(import.meta.resolve('@stellar/stellar-sdk'))
   );
   const compiled = ts.transpileModule(factorySource, {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 },
@@ -84,10 +97,22 @@ export async function buildProtocolFixtures(root = ROOT) {
   const factory = createSorobanFixtureFactory(spec);
   const cases = [
     ['success', () => factory.simulationSuccess()],
-    ['cpu_limit', () => factory.simulationSuccess({ cpuInsns: FIXTURE_RESOURCE_LIMITS.cpuInstructions })],
-    ['cpu_over_limit', () => factory.simulationSuccess({ cpuInsns: FIXTURE_RESOURCE_LIMITS.cpuInstructions + 1 })],
-    ['memory_limit', () => factory.simulationSuccess({ memBytes: FIXTURE_RESOURCE_LIMITS.memoryBytes })],
-    ['memory_over_limit', () => factory.simulationSuccess({ memBytes: FIXTURE_RESOURCE_LIMITS.memoryBytes + 1 })],
+    [
+      'cpu_limit',
+      () => factory.simulationSuccess({ cpuInsns: FIXTURE_RESOURCE_LIMITS.cpuInstructions }),
+    ],
+    [
+      'cpu_over_limit',
+      () => factory.simulationSuccess({ cpuInsns: FIXTURE_RESOURCE_LIMITS.cpuInstructions + 1 }),
+    ],
+    [
+      'memory_limit',
+      () => factory.simulationSuccess({ memBytes: FIXTURE_RESOURCE_LIMITS.memoryBytes }),
+    ],
+    [
+      'memory_over_limit',
+      () => factory.simulationSuccess({ memBytes: FIXTURE_RESOURCE_LIMITS.memoryBytes + 1 }),
+    ],
     ['auth_failure', () => factory.authFailure()],
     ['resource_exhaustion', () => factory.resourceExhaustion()],
     ['restore_required', () => factory.restoreRequired()],
@@ -121,13 +146,16 @@ export async function refreshProtocolFixtures({ check = false, root = ROOT } = {
     if (error.code !== 'ENOENT') throw error;
   }
   if (actual === expected) return false;
-  if (check) throw new Error('Protocol fixtures missing or stale. Run: pnpm run fixtures:protocol:refresh');
+  if (check)
+    throw new Error('Protocol fixtures missing or stale. Run: pnpm run fixtures:protocol:refresh');
   const temporary = `${target}.${process.pid}.${randomUUID()}.tmp`;
   try {
     await writeFile(temporary, expected, { encoding: 'utf8', flag: 'wx' });
     await rename(temporary, target);
   } finally {
-    await unlink(temporary).catch((error) => { if (error.code !== 'ENOENT') throw error; });
+    await unlink(temporary).catch((error) => {
+      if (error.code !== 'ENOENT') throw error;
+    });
   }
   return true;
 }
