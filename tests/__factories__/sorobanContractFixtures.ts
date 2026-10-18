@@ -21,6 +21,9 @@ import { Networks, SorobanDataBuilder, StrKey, hash, nativeToScVal } from '@stel
 
 export type SorobanFixtureNetwork = 'testnet' | 'futurenet' | 'standalone';
 
+/** Modeled protocol, not the current live-network version. See protocol-fixture-spec.json. */
+export const FIXTURE_PROTOCOL_VERSION = 22;
+
 export type SorobanFixtureScenario =
   | 'success'
   | 'auth_failure'
@@ -242,9 +245,9 @@ export function createSorobanFixtureFactory(options: SorobanFixtureOptions = {})
         if (scenario === 'rpc_error') return rpcError({ id });
         return simulationSuccess({ id });
       case 'getNetwork':
-        return envelope(id, { result: { passphrase: networkPassphrase, protocolVersion: 22 } });
+        return envelope(id, { result: { passphrase: networkPassphrase, protocolVersion: FIXTURE_PROTOCOL_VERSION } });
       case 'getLatestLedger':
-        return envelope(id, { result: { id: seededBytes(seed, `ledger:${ledger}`).toString('hex'), sequence: ledger, protocolVersion: 22 } });
+        return envelope(id, { result: { id: seededBytes(seed, `ledger:${ledger}`).toString('hex'), sequence: ledger, protocolVersion: FIXTURE_PROTOCOL_VERSION } });
       case 'getHealth':
         return envelope(id, { result: { status: 'healthy', latestLedger: ledger, oldestLedger: startLedger } });
       case '':
